@@ -1,0 +1,13 @@
+export 'balance_binding.dart';
+export 'completed_tips_binding.dart';
+export 'current_trip_binding.dart';
+export 'home_binding.dart';
+export 'introduction_binding.dart';
+export 'otp_binding.dart';
+export 'phone_input_binding.dart';
+export 'rider_feedback_binding.dart';
+export 'rider_personal_info_binding.dart';
+export 'rider_proffesional_info_binding.dart';
+export 'splash_binding.dart';
+export 'unknown_route_binding.dart';
+export 'wait_for_approval_binding.dart';

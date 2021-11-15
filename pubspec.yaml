@@ -1,0 +1,57 @@
+name: cab_rider_its
+description: A new Flutter project.
+
+version: 1.0.4+1.0.15
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.3
+  get: ^4.3.8
+  get_storage: ^2.0.3
+  freezed_annotation: ^0.15.0
+  dartz: ^0.10.0
+  json_serializable: ^5.0.2
+  rxdart: ^0.27.2
+  google_fonts: ^2.1.0
+  # Base For All Firebase Services
+  firebase_core: ^1.6.0
+  # Dependency For firebase Auth
+  firebase_auth: ^3.1.1
+  # Dependency For Firestore Database
+  cloud_firestore: ^2.5.2
+  dio: ^4.0.0
+  flutter_polyline_points: ^1.0.0
+  google_maps_flutter: ^2.0.8
+  geolocator: ^7.6.0
+  geocoding: ^2.0.1
+  animate_do: ^2.0.0
+  timelines: ^0.1.0
+  progress_state_button: ^1.0.3
+  intl: ^0.17.0
+  flutter_svg: ^0.22.0
+  permission_handler: ^8.1.6
+  firebase_messaging: ^10.0.7
+  material_dialogs: ^1.1.1
+  cloud_functions: ^3.0.3
+  flutter_spinkit: ^5.1.0
+  flutter_rating_bar: ^4.0.0
+  fluttertoast: ^8.0.8
+
+dev_dependencies:
+  build_runner: ^2.1.4
+  freezed: ^0.15.0+1
+  flutter_lints: ^1.0.4
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/anim/
+    - assets/svg/
+    - assets/svg/dashboard/
