@@ -16,9 +16,12 @@ class LocationAccessPage extends GetView<LocationAccessController> {
         child: Column(
           children: [
             const VerticalAppSpacer(),
-            SvgPicture.asset(
-              Assets.svgLocation,
-              height: 300,
+            AspectRatio(
+              aspectRatio: 3.5 / 4,
+              child: SvgPicture.asset(
+                Assets.svgLocation,
+                height: 300,
+              ),
             ),
             const VerticalAppSpacer(space: 32.0),
             const Text(

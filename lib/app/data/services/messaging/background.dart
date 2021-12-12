@@ -14,16 +14,10 @@ handleNotificationWhenNeedDriverBG(RemoteMessage message) async {
   var controller = Get.put<RiderController>(RiderController());
   await controller.readCurrentUser();
   if (message.data['vehicle'] != controller.rider.vehicleType) return;
-  Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
-      .then((value) {
+  Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high).then((value) {
     print(value.latitude);
     print(value.longitude);
-    FirebaseFirestore.instance
-        .collection('inProcessingTrips')
-        .doc(message.data['id'])
-        .collection('availableRiders')
-        .doc(controller.rider.id)
-        .set({
+    FirebaseFirestore.instance.collection('inProcessingTrips').doc(message.data['id']).collection('availableRiders').doc(controller.rider.id).set({
       'lat': value.latitude,
       'lng': value.longitude,
     });
@@ -31,10 +25,12 @@ handleNotificationWhenNeedDriverBG(RemoteMessage message) async {
 }
 
 Future<void> firebaseBackgroundMessageHandler(RemoteMessage message) async {
-  print('background message ${message.notification!.body}');
+  if (message.notification != null)
+    print('background message ${message.notification!.body}');
+  else
+    print("No Notification");
   await Firebase.initializeApp();
-  if (message.data.containsKey('funName') &&
-      FirebaseAuth.instance.currentUser != null) {
+  if (message.data.containsKey('funName') && FirebaseAuth.instance.currentUser != null) {
     switch (message.data['funName']) {
       case 'notificationWhenNeedDriver':
         handleNotificationWhenNeedDriverBG(message);
