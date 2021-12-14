@@ -1,81 +1,43 @@
-import 'package:cab_rider_its/app/generated/assets.dart';
-import 'package:cab_rider_its/app/routes/app_routes.dart';
-import 'package:cab_rider_its/app/ui/global_widgets/global_widgets.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import '../../../models/dashboard_tile_item.model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../controllers/controllers.dart';
+import '../../theme/text_theme.dart';
 
 class HomePage extends GetView<HomeController> {
+  const HomePage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
-        backgroundColor: Colors.green,
         title: Text(
           'Home',
-          style: GoogleFonts.catamaran(
+          style: AppTextStyle(
+            color: context.theme.colorScheme.onPrimary,
             fontWeight: FontWeight.bold,
-            fontSize: 24.0,
-            letterSpacing: 1.0,
           ),
         ),
         centerTitle: true,
       ),
-      backgroundColor: Colors.grey.shade200,
       body: SafeArea(
         child: Column(
           children: [
-            _RiderStatusSwitch(),
+            const _RiderStatusSwitch(),
             Expanded(
               child: Container(
-                padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 10.0),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        DashboardTile(
-                          title: 'Completed Trips',
-                          svg: Assets.dashboardCompleted,
-                          onTap: () {
-                            Get.toNamed(AppRoutes.COMPLETED_TIPS);
-                          },
-                        ),
-                        HorizontalAppSpacer(space: 16.0),
-                        DashboardTile(
-                          onTap: () {
-                            Get.toNamed(AppRoutes.CURRENT_TRIP);
-                          },
-                          title: 'Current Trips',
-                          svg: Assets.dashboardPending,
-                        ),
-                      ],
-                    ),
-                    VerticalAppSpacer(),
-                    Row(
-                      children: [
-                        DashboardTile(
-                          onTap: () {
-                            Get.toNamed(AppRoutes.BALANCE);
-                          },
-                          title: 'Balance',
-                          svg: Assets.dashboardWallet,
-                        ),
-                        HorizontalAppSpacer(space: 16.0),
-                        DashboardTile(
-                          onTap: () async {
-                            await FirebaseAuth.instance.signOut();
-                            Get.offAllNamed(AppRoutes.SPLASH);
-                          },
-                          title: 'Sign Out',
-                          svg: Assets.dashboardLogout,
-                        ),
-                      ],
-                    ),
-                  ],
+                padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 10.0),
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 4,
+                    mainAxisSpacing: 4,
+                  ),
+                  itemCount: controller.dashboardItems.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return _DashboardTile(item: controller.dashboardItems[index]);
+                  },
                 ),
               ),
             ),
@@ -85,8 +47,6 @@ class HomePage extends GetView<HomeController> {
     );
   }
 }
-
-
 
 class _RiderStatusSwitch extends StatefulWidget {
   const _RiderStatusSwitch({Key? key}) : super(key: key);
@@ -98,7 +58,6 @@ class _RiderStatusSwitch extends StatefulWidget {
 class _RiderStatusSwitchState extends State<_RiderStatusSwitch> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -107,6 +66,7 @@ class _RiderStatusSwitchState extends State<_RiderStatusSwitch> {
     return GetBuilder<RiderController>(
       builder: (logic) {
         return SwitchListTile(
+          activeColor: context.theme.colorScheme.primary,
           value: logic.rider.riderStatus as bool,
           title: const Text(
             'Rider Status',
@@ -114,66 +74,49 @@ class _RiderStatusSwitchState extends State<_RiderStatusSwitch> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          onChanged: (value) {
-            logic.changeRiderStatus(value);
-          },
+          onChanged: logic.changeRiderStatus,
         );
       },
     );
   }
 }
 
-class DashboardTile extends StatelessWidget {
-  const DashboardTile({
+class _DashboardTile extends StatelessWidget {
+  const _DashboardTile({
     Key? key,
-    required this.onTap,
-    required this.title,
-    required this.svg,
+    required this.item,
   }) : super(key: key);
-
-  final Callback onTap;
-  final String title;
-  final String svg;
+  final DashboardTileItem item;
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: GestureDetector(
-        child: Container(
-          height: 150,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Image.asset(
-                svg,
-                fit: BoxFit.cover,
-                width: 80,
-                height: 80,
-              ),
-              Text(
-                title,
-                style: GoogleFonts.catamaran(
-                  fontSize: 15.0,
-                  color: Colors.grey.shade600,
-                  fontWeight: FontWeight.bold,
+    return Material(
+      child: InkWell(
+        child: Card(
+          child: SizedBox(
+            height: 150,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Image.asset(
+                  item.image,
+                  fit: BoxFit.cover,
+                  width: 80,
+                  height: 80,
                 ),
-              )
-            ],
-          ),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8.0),
-            boxShadow: [
-              BoxShadow(
-                offset: Offset(0, 0),
-                blurRadius: 5.0,
-                spreadRadius: 5.0,
-                color: Colors.grey.shade300,
-              ),
-            ],
+                Text(
+                  item.title,
+                  style: AppTextStyle(
+                    fontSize: 15.0,
+                    // color: Colors.grey.shade600,
+                    fontWeight: FontWeight.bold,
+                  ),
+                )
+              ],
+            ),
           ),
         ),
-        onTap: onTap,
+        onTap: item.onTap,
       ),
     );
   }

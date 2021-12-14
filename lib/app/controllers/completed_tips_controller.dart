@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import '../data/models/booked_trip_model/booked_trip_model.dart';
 import '../models/models.dart';
 import 'rider_controller.dart';
 
 class CompletedTripsController extends GetxController {
-  List<BookedTripModel>? completedTrips;
+  List<BookedTripModel> completedTrips = [];
 
   @override
   void onInit() {
@@ -20,9 +21,11 @@ class CompletedTripsController extends GetxController {
         .where('riderId', isEqualTo: rid)
         .get()
         .then((value) {
-      completedTrips = value.docs
-          .map((trip) => BookedTripModel.fromJson(trip.data(), trip.id))
-          .toList();
+
+      completedTrips.clear();
+      for (var element in value.docs) {
+        completedTrips.add(BookedTripModel.fromDocument(element));
+      }
       update();
     });
   }

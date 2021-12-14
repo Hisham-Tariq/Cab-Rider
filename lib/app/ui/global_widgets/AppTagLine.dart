@@ -1,4 +1,3 @@
-import '../../customization/customization.dart';
 import 'package:flutter/material.dart';
 
 class AppTagLine extends StatelessWidget {
@@ -6,9 +5,7 @@ class AppTagLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      'Designed for living in a better world.',
-      style: AppTextStyle.description,
-    );
+    return const Text(
+      'Designed for living in a better world.');
   }
 }

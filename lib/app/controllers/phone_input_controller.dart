@@ -115,4 +115,13 @@ class PhoneInputController extends GetxController {
       verificationFailed: onVerificationFailed,
     );
   }
+
+  String? validatePhoneNumber(String? value) {
+    if (value!.isEmpty) {
+      return 'Must provide the phone number';
+    } else if (value.length != 11) {
+      return 'Invalid Phone Number';
+    }
+    return null;
+  }
 }

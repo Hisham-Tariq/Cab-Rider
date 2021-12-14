@@ -1,23 +1,24 @@
+import '../utils/utils.dart';
 import 'package:flutter/material.dart';
 
-class VerticalAppSpacer extends StatelessWidget {
-  const VerticalAppSpacer({Key? key, this.space = 8.0}) : super(key: key);
+class VerticalSpacer extends StatelessWidget {
+  const VerticalSpacer({Key? key, this.space = 6.0}) : super(key: key);
   final double space;
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: space,
+      height: ResponsiveSize.height(space),
     );
   }
 }
 
-class HorizontalAppSpacer extends StatelessWidget {
-  const HorizontalAppSpacer({Key? key, this.space = 8.0}) : super(key: key);
+class HorizontalSpacer extends StatelessWidget {
+  const HorizontalSpacer({Key? key, this.space = 6.0}) : super(key: key);
   final double space;
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: space,
+      width: ResponsiveSize.width(space),
     );
   }
 }

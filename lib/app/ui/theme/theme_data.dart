@@ -55,7 +55,7 @@ class CustomTheme {
           backgroundColor: colors.primary,
           primary: colors.onPrimary,
           shape: const StadiumBorder(),
-          minimumSize: const Size(200, 50),
+          minimumSize: const Size(2000, 50),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(

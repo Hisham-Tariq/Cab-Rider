@@ -83,7 +83,7 @@ class AppPages {
       name: AppRoutes.RIDER_PROFFESIONAL_INFO,
       page: () => RiderProffesionalInfoPage(),
       binding: RiderProffesionalInfoBinding(),
-      transition: _defaultTransition,
+      transition: Transition.rightToLeft,
     ),
     GetPage(
       name: AppRoutes.WAIT_FOR_APPROVAL,

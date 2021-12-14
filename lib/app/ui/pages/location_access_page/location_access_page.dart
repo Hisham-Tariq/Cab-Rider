@@ -15,7 +15,7 @@ class LocationAccessPage extends GetView<LocationAccessController> {
       body: SafeArea(
         child: Column(
           children: [
-            const VerticalAppSpacer(),
+            const VerticalSpacer(),
             AspectRatio(
               aspectRatio: 3.5 / 4,
               child: SvgPicture.asset(
@@ -23,7 +23,7 @@ class LocationAccessPage extends GetView<LocationAccessController> {
                 height: 300,
               ),
             ),
-            const VerticalAppSpacer(space: 32.0),
+            const VerticalSpacer(space: 32.0),
             const Text(
               'Location Services',
               style: TextStyle(
@@ -31,7 +31,7 @@ class LocationAccessPage extends GetView<LocationAccessController> {
                 fontSize: 18.0,
               ),
             ),
-            const VerticalAppSpacer(space: 20.0),
+            const VerticalSpacer(space: 20.0),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32.0),
               child: Text(
@@ -43,7 +43,7 @@ class LocationAccessPage extends GetView<LocationAccessController> {
                 ),
               ),
             ),
-            const VerticalAppSpacer(space: 48.0),
+            const VerticalSpacer(space: 48.0),
             TextButton(
               child: const Text('Grant Access'),
               onPressed: controller.handleGrantAcess,

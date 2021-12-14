@@ -14,16 +14,10 @@ import 'common.dart';
 handleNotificationWhenNeedDriver(RemoteMessage message) {
   var controller = Get.find<RiderController>();
   if (message.data['vehicle'] != controller.rider.vehicleType) return;
-  Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
-      .then((value) {
+  Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high).then((value) {
     print(value.latitude);
     print(value.longitude);
-    FirebaseFirestore.instance
-        .collection('inProcessingTrips')
-        .doc(message.data['id'])
-        .collection('availableRiders')
-        .doc(controller.rider.id)
-        .set({
+    FirebaseFirestore.instance.collection('inProcessingTrips').doc(message.data['id']).collection('availableRiders').doc(controller.rider.id).set({
       'lat': value.latitude,
       'lng': value.longitude,
     });
@@ -45,12 +39,12 @@ handleRequestTheRiderAboutNewTrip(RemoteMessage message) async {
       ),
       context: Get.context as BuildContext,
       actions: [
-        FullTextButton(
+        TextButton(
           onPressed: () {
             updateTheRiderResponse(true, message.data['tripId']);
             navigator!.pop();
           },
-          text: 'Accept',
+          child: const Text('Accept'),
         ),
         TimerButton(
           backgroundColor: Colors.red.withOpacity(0.0),
@@ -68,8 +62,7 @@ handleRequestTheRiderAboutNewTrip(RemoteMessage message) async {
 
 firebaseForegroundMessage(RemoteMessage message) {
   if (message.notification != null) print(message.notification!.body);
-  if (message.data.containsKey('funName') &&
-      FirebaseAuth.instance.currentUser != null) {
+  if (message.data.containsKey('funName') && FirebaseAuth.instance.currentUser != null) {
     switch (message.data['funName']) {
       case 'notificationWhenNeedDriver':
         handleNotificationWhenNeedDriver(message);

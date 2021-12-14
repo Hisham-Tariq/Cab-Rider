@@ -1,19 +1,20 @@
 import 'package:animate_do/animate_do.dart';
-import 'package:cab_rider_its/app/generated/assets.dart';
-import 'package:cab_rider_its/app/models/models.dart';
-import 'package:cab_rider_its/app/ui/global_widgets/global_widgets.dart';
+import '../../../generated/assets.dart';
+import '../../../models/models.dart';
+import '../../global_widgets/global_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../controllers/controllers.dart';
+import '../../theme/text_theme.dart';
 
 class CurrentTripPage extends GetView<CurrentTripController> {
-
   late final GoogleMapController _mapController;
   final _riderController = Get.find<RiderController>();
+
+  CurrentTripPage({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,8 +22,7 @@ class CurrentTripPage extends GetView<CurrentTripController> {
         child: _riderController.isRiderHaveCurrentTrip
             ? GetBuilder<CurrentTripController>(
                 builder: (controller) {
-                  if (controller.currentLocation != null &&
-                      controller.trip != null) {
+                  if (controller.currentLocation != null && controller.trip != null) {
                     return Stack(
                       children: [
                         // Google Map
@@ -39,39 +39,26 @@ class CurrentTripPage extends GetView<CurrentTripController> {
                             polylines: {
                               if (controller.tripDirections != null)
                                 Polyline(
-                                  polylineId:
-                                      const PolylineId('overview_polyline'),
-                                  color: controller.trip!.tripStatus ==
-                                          TripStatus.pending
-                                      ? Colors.red
-                                      : Colors.green,
+                                  polylineId: const PolylineId('overview_polyline'),
+                                  color: controller.trip!.tripStatus == TripStatus.pending ? Colors.red : Colors.green,
                                   width: 5,
-                                  points: controller
-                                      .tripDirections!.polylinePoints
-                                      .map((e) =>
-                                          LatLng(e.latitude, e.longitude))
-                                      .toList(),
+                                  points: controller.tripDirections!.polylinePoints.map((e) => LatLng(e.latitude, e.longitude)).toList(),
                                 ),
                             },
                             markers: [
-                              if (controller.trip!.tripStatus ==
-                                  TripStatus.pending)
+                              if (controller.trip!.tripStatus == TripStatus.pending)
                                 Marker(
                                   markerId: MarkerId('PickUp'),
                                   position: controller.trip!.userPickupLocation,
                                 ),
-                              if (controller.trip!.tripStatus ==
-                                  TripStatus.started)
+                              if (controller.trip!.tripStatus == TripStatus.started)
                                 Marker(
-                                  icon: BitmapDescriptor.defaultMarkerWithHue(
-                                      BitmapDescriptor.hueGreen),
+                                  icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
                                   markerId: MarkerId('Destination'),
-                                  position:
-                                      controller.trip!.userDestinationLocation,
+                                  position: controller.trip!.userDestinationLocation,
                                 ),
                             ].toSet(),
-                            onMapCreated: (controller) =>
-                                _mapController = controller,
+                            onMapCreated: (controller) => _mapController = controller,
                             zoomControlsEnabled: false,
                             myLocationEnabled: true,
                             myLocationButtonEnabled: true,
@@ -88,7 +75,7 @@ class CurrentTripPage extends GetView<CurrentTripController> {
                     );
                   } else {
                     return SpinKitFadingCircle(
-                      color: Colors.green,
+                      color: context.theme.colorScheme.primary,
                     );
                   }
                 },
@@ -108,7 +95,7 @@ class CurrentTripPage extends GetView<CurrentTripController> {
                       child: Center(
                         child: Text(
                           "Don't have any schedule trips",
-                          style: GoogleFonts.catamaran(
+                          style: AppTextStyle(
                             fontSize: 24.0,
                             fontWeight: FontWeight.bold,
                           ),
@@ -121,6 +108,7 @@ class CurrentTripPage extends GetView<CurrentTripController> {
       ),
     );
   }
+
   Container buildInfoPanel() {
     return Container(
       height: 250,
@@ -149,7 +137,7 @@ class CurrentTripPage extends GetView<CurrentTripController> {
                     Center(
                       child: Text(
                         'Current Trip',
-                        style: GoogleFonts.catamaran(
+                        style: AppTextStyle(
                           fontSize: 24.0,
                           color: Colors.green,
                           fontWeight: FontWeight.w900,
@@ -158,23 +146,19 @@ class CurrentTripPage extends GetView<CurrentTripController> {
                     ),
                     TitleDetail(
                       title: 'Customer Name',
-                      detail:
-                          GetUtils.capitalizeFirst(controller.trip!.userName)
-                              as String,
+                      detail: GetUtils.capitalizeFirst(controller.trip!.userName) as String,
                     ),
-                    VerticalAppSpacer(),
+                    VerticalSpacer(),
                     TitleDetail(
                       title: 'Customer Contact',
                       detail: controller.trip!.userPhone,
                     ),
-                    VerticalAppSpacer(),
+                    VerticalSpacer(),
                     TitleDetail(
                       title: 'Trip Status',
-                      detail:
-                          GetUtils.capitalizeFirst(controller.trip!.tripStatus)
-                              as String,
+                      detail: GetUtils.capitalizeFirst(controller.trip!.tripStatus) as String,
                     ),
-                    VerticalAppSpacer(space: 16.0),
+                    VerticalSpacer(space: 16.0),
                     Row(
                       children: [
                         _LegendDetail(
@@ -198,22 +182,21 @@ class CurrentTripPage extends GetView<CurrentTripController> {
               FadeIn(
                 child: Container(
                   height: 55,
-                  child: FullOutlinedTextButton(
+                  child: OutlinedButton(
                     onPressed: controller.onStartTrip,
-                    text: 'Start',
-                    backgroundColor: Colors.grey.withOpacity(0.0),
+                    child: const Text('Start'),
                   ),
                 ),
               ),
             if (controller.trip!.tripStatus == TripStatus.started)
               FadeIn(
-                child: Container(
+                child: SizedBox(
                   height: 55,
-                  child: FullOutlinedTextButton(
+                  child: OutlinedButton(
                     onPressed: controller.onEndTrip,
-                    text: 'End',
-                    buttonColor: Colors.red,
-                    backgroundColor: Colors.grey.withOpacity(0.0),
+                    child: const Text('End'),
+                    style: OutlinedButton.styleFrom(
+                    ),
                   ),
                 ),
               ),
@@ -223,6 +206,7 @@ class CurrentTripPage extends GetView<CurrentTripController> {
     );
   }
 }
+
 class _LegendDetail extends StatelessWidget {
   const _LegendDetail({
     Key? key,
@@ -245,7 +229,7 @@ class _LegendDetail extends StatelessWidget {
               icon,
               color: iconColor,
             ),
-            HorizontalAppSpacer(),
+            HorizontalSpacer(),
             Text(title),
           ],
         ),
@@ -255,8 +239,7 @@ class _LegendDetail extends StatelessWidget {
 }
 
 class TitleDetail extends StatelessWidget {
-  const TitleDetail({Key? key, required this.title, required this.detail})
-      : super(key: key);
+  const TitleDetail({Key? key, required this.title, required this.detail}) : super(key: key);
 
   final String title;
   final String detail;
@@ -268,7 +251,7 @@ class TitleDetail extends StatelessWidget {
         children: [
           TextSpan(
             text: '$title: ',
-            style: GoogleFonts.catamaran(
+            style: AppTextStyle(
               fontWeight: FontWeight.w900,
               fontSize: 18,
               color: Colors.green,
@@ -276,7 +259,7 @@ class TitleDetail extends StatelessWidget {
           ),
           TextSpan(
             text: detail,
-            style: GoogleFonts.catamaran(
+            style: AppTextStyle(
               color: Colors.black,
               fontSize: 16,
             ),

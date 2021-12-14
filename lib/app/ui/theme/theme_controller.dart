@@ -98,6 +98,7 @@ class ThemeController extends GetxController {
         }
         break;
     }
+
     update();
   }
 

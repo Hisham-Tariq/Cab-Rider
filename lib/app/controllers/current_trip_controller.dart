@@ -1,18 +1,17 @@
 import 'dart:async';
 
-import 'package:cab_rider_its/app/customization/customization.dart';
-import 'package:cab_rider_its/app/generated/assets.dart';
-import 'package:cab_rider_its/app/ui/global_widgets/global_widgets.dart';
+import '../data/models/booked_trip_model/booked_trip_model.dart';
+import '../generated/assets.dart';
+import 'package:cab_rider_its/app/ui/global_widgets/global_widgets.dart' show TimerButton, VerticalSpacer;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import '../models/models.dart';
+import '../ui/theme/text_theme.dart';
 import 'direction_controller.dart';
 import 'rider_controller.dart';
 
@@ -32,8 +31,7 @@ class CurrentTripController extends GetxController {
     print(Get.find<RiderController>().rider.currentBooking);
     bookingId = Get.find<RiderController>().rider.currentBooking;
     if (bookingId != null) {
-      _currentBookingReference =
-          FirebaseFirestore.instance.collection('BookedTrips').doc(bookingId);
+      _currentBookingReference = FirebaseFirestore.instance.collection('BookedTrips').doc(bookingId);
       _listenToBookedTripForChanges();
       initPositionStream();
     }
@@ -42,8 +40,7 @@ class CurrentTripController extends GetxController {
 
   @override
   void onClose() {
-    if (this.isPositionStreamCancel != null &&
-        !(this.isPositionStreamCancel as bool)) {
+    if (isPositionStreamCancel != null && !(isPositionStreamCancel as bool)) {
       print('Position Stream is Cancelled');
       _positionStream.cancel();
     }
@@ -51,7 +48,7 @@ class CurrentTripController extends GetxController {
 
   _listenToBookedTripForChanges() {
     _tripListener = _currentBookingReference!.snapshots().listen((event) async {
-      trip = BookedTripModel.fromJson(event.data(), event.id);
+      trip = BookedTripModel.fromDocument(event);
       if (trip!.tripStatus == TripStatus.ended) {
         _tripListener.cancel();
         _onRideComplete();
@@ -67,11 +64,8 @@ class CurrentTripController extends GetxController {
 
   Future _onRideComplete() async {
     var rider = Get.find<RiderController>();
-    await FirebaseFirestore.instance
-        .collection('rider')
-        .doc(rider.currentRiderUID)
-        .update({
-      'balanceToPay': rider.rider.balanceToPay! + this.trip!.tripPrice,
+    await FirebaseFirestore.instance.collection('rider').doc(rider.currentRiderUID).update({
+      'balanceToPay': rider.rider.balanceToPay! + trip!.tripPrice,
     });
     return _currentBookingReference!.update({
       'completedAt': FieldValue.serverTimestamp(),
@@ -79,10 +73,7 @@ class CurrentTripController extends GetxController {
   }
 
   Future _removeTheRidersCurrentBooking() {
-    return FirebaseFirestore.instance
-        .collection('rider')
-        .doc(Get.find<RiderController>().currentRiderUID)
-        .update({
+    return FirebaseFirestore.instance.collection('rider').doc(Get.find<RiderController>().currentRiderUID).update({
       'eligible': true,
       'currentBooking': FieldValue.delete(),
     });
@@ -102,26 +93,20 @@ class CurrentTripController extends GetxController {
 
   initPositionStream() async {
     var data = await _currentBookingReference!.get();
-    trip = BookedTripModel.fromJson(data.data(), data.id);
+    trip = BookedTripModel.fromDocument(data);
     isPositionStreamCancel = false;
-    _positionStream = Geolocator.getPositionStream(
-            desiredAccuracy: LocationAccuracy.bestForNavigation)
-        .listen((event) {
+    _positionStream = Geolocator.getPositionStream(desiredAccuracy: LocationAccuracy.bestForNavigation).listen((event) {
       print('Direction Changed');
-      this.currentLocation = LatLng(event.latitude, event.longitude);
-      if (trip!.tripStatus == TripStatus.pending)
-        _fetchTripDirection(
-            this.currentLocation as LatLng, trip!.userPickupLocation);
-      if (trip!.tripStatus == TripStatus.started)
-        _fetchTripDirection(
-            this.currentLocation as LatLng, trip!.userDestinationLocation);
+      currentLocation = LatLng(event.latitude, event.longitude);
+      if (trip!.tripStatus == TripStatus.pending) _fetchTripDirection(currentLocation as LatLng, trip!.userPickupLocation);
+      if (trip!.tripStatus == TripStatus.started) _fetchTripDirection(currentLocation as LatLng, trip!.userDestinationLocation);
       if (trip!.tripStatus == TripStatus.ended) {
-        if (!(this.isPositionStreamCancel as bool)) {
+        if (!(isPositionStreamCancel as bool)) {
           _positionStream.cancel();
           print('Position Stream is Cancelled');
         }
         _tripDirections = null;
-        this.isPositionStreamCancel = true;
+        isPositionStreamCancel = true;
       }
       update();
     });
@@ -209,28 +194,24 @@ class __RequestToStartSheetState extends State<_RequestToStartSheet> {
   }
 
   requestToConfirm() async {
-    if (!this.isProcessing)
-      this.setState(() {
-        this.isProcessing = true;
+    if (!isProcessing) {
+      setState(() {
+        isProcessing = true;
       });
+    }
     await _intiResponseDoc();
     _listenResponseDoc();
     _requestToConfirm();
   }
 
   _intiResponseDoc() async {
-    await FirebaseFirestore.instance
-        .collection('BookedTrips')
-        .doc(controller.bookingId)
-        .collection('response')
-        .doc('start')
-        .set({
+    await FirebaseFirestore.instance.collection('BookedTrips').doc(controller.bookingId).collection('response').doc('start').set({
       'requestedAt': FieldValue.serverTimestamp(),
     });
   }
 
   _listenResponseDoc() {
-    if (this.isSubscriptionActive) _userResponseListener.cancel();
+    if (isSubscriptionActive) _userResponseListener.cancel();
     _userResponseListener = FirebaseFirestore.instance
         .collection('BookedTrips')
         .doc(controller.bookingId)
@@ -240,24 +221,23 @@ class __RequestToStartSheetState extends State<_RequestToStartSheet> {
         .listen((event) {
       if (event.data()!.containsKey('response')) {
         print('User Responded with: ${event['response']}');
-        this.setState(() {
+        setState(() {
           _userResponseListener.cancel();
-          this.isSubscriptionActive = false;
-          this._userResponse = event['response'];
-          this.isProcessing = false;
-          if (this._userResponse) {
+          isSubscriptionActive = false;
+          _userResponse = event['response'];
+          isProcessing = false;
+          if (_userResponse) {
             controller.updateTripStatus(TripStatus.started);
           }
         });
       }
     });
-    this.isSubscriptionActive = true;
+    isSubscriptionActive = true;
   }
 
   _requestToConfirm() async {
     print('Starting to Request the User');
-    HttpsCallable callable =
-        FirebaseFunctions.instance.httpsCallable('confirmUserTripHasStarted');
+    HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('confirmUserTripHasStarted');
     callable.call(<String, dynamic>{
       'docId': 'start',
       'userId': controller.trip!.userId,
@@ -270,9 +250,9 @@ class __RequestToStartSheetState extends State<_RequestToStartSheet> {
 
   @override
   Widget build(BuildContext context) {
-    print('Current User Response: ${this._userResponse}');
-    print('isRequesting: ${this.isProcessing}');
-    print('isSubscriptionActive: ${this.isSubscriptionActive}');
+    print('Current User Response: ${_userResponse}');
+    print('isRequesting: ${isProcessing}');
+    print('isSubscriptionActive: ${isSubscriptionActive}');
     return Material(
       child: Container(
         height: 400,
@@ -287,10 +267,10 @@ class __RequestToStartSheetState extends State<_RequestToStartSheet> {
               child: Text(
                 'Start Trip',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.catamaran(
+                style: AppTextStyle(
                   fontWeight: FontWeight.w900,
                   fontSize: 24.0,
-                  color: AppColors.primary,
+                  color: context.theme.colorScheme.primary,
                 ),
               ),
             ),
@@ -304,10 +284,10 @@ class __RequestToStartSheetState extends State<_RequestToStartSheet> {
                     width: 150,
                     height: 150,
                   ),
-                  VerticalAppSpacer(space: 24.0),
+                  VerticalSpacer(space: 24.0),
                   Text(
                     _getRespectiveText(),
-                    style: GoogleFonts.catamaran(
+                    style: AppTextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 24.0,
                       color: _getTextColor(),
@@ -325,41 +305,37 @@ class __RequestToStartSheetState extends State<_RequestToStartSheet> {
   }
 
   _getRespectiveAnim() {
-    if (this.isProcessing)
+    if (isProcessing) {
       return Assets.animLoading;
-    else if (!this.isProcessing && this._userResponse == true)
+    } else if (!isProcessing && _userResponse == true) {
       return Assets.animSuccessResponse;
-    else if (!this.isProcessing && this._userResponse == false)
+    } else if (!isProcessing && _userResponse == false) {
       return Assets.animRejectResponse;
+    }
   }
 
   _getRespectiveButton() {
     Widget button = Container();
-    if (this.isProcessing)
-      button = Container(
-        child: FullOutlinedTextButton(
-          buttonColor: AppColors.primary,
-          text: 'Request Again',
-          onPressed: requestToConfirm,
-        ),
+    if (isProcessing) {
+      button = OutlinedButton(
+        child: const Text('Request Again'),
+        onPressed: requestToConfirm,
       );
-    else if (!this.isProcessing && this._userResponse == true)
+    } else if (!isProcessing && _userResponse == true) {
       button = TimerButton(
         time: 3,
         title: 'Close',
         backgroundColor: Colors.white,
-        borderColor: AppColors.primary,
-        textColor: AppColors.primary,
+        borderColor: context.theme.colorScheme.primary,
+        textColor: context.theme.colorScheme.primary,
         onTap: Get.back,
       );
-    else if (!this.isProcessing && this._userResponse == false)
-      button = Container(
-        child: FullOutlinedTextButton(
-          buttonColor: AppColors.error,
-          text: 'Request Again',
-          onPressed: requestToConfirm,
-        ),
+    } else if (!isProcessing && _userResponse == false) {
+      button = OutlinedButton(
+        child: const Text('Request Again'),
+        onPressed: requestToConfirm,
       );
+    }
     return Positioned(
       bottom: 0,
       right: 0,
@@ -369,19 +345,21 @@ class __RequestToStartSheetState extends State<_RequestToStartSheet> {
   }
 
   _getRespectiveText() {
-    if (this.isProcessing)
+    if (isProcessing) {
       return 'Wait for the customer to accept';
-    else if (!this.isProcessing && this._userResponse == true)
+    } else if (!isProcessing && _userResponse == true) {
       return 'Customer have accepted';
-    else if (!this.isProcessing && this._userResponse == false)
+    } else if (!isProcessing && _userResponse == false) {
       return 'Customer have rejected try again';
+    }
   }
 
   _getTextColor() {
-    if (!this.isProcessing && this._userResponse == false)
-      return AppColors.error;
-    else
-      return AppColors.primary;
+    if (!isProcessing && _userResponse == false) {
+      return context.theme.colorScheme.error;
+    } else {
+      return context.theme.colorScheme.primary;
+    }
   }
 }
 
@@ -407,53 +385,43 @@ class __RequestToEndSheetState extends State<_RequestToEndSheet> {
   }
 
   requestUser() async {
-    if (!this.isProcessing)
-      this.setState(() {
-        this.isProcessing = true;
+    if (!isProcessing) {
+      setState(() {
+        isProcessing = true;
       });
+    }
     await _intiResponseDoc();
     _listenResponseDoc();
     _requestToConfirm();
   }
 
   _intiResponseDoc() async {
-    await FirebaseFirestore.instance
-        .collection('BookedTrips')
-        .doc(controller.bookingId)
-        .collection('response')
-        .doc('end')
-        .set({
+    await FirebaseFirestore.instance.collection('BookedTrips').doc(controller.bookingId).collection('response').doc('end').set({
       'requestedAt': FieldValue.serverTimestamp(),
     });
   }
 
   _listenResponseDoc() {
-    if (!this.isSubscriptionCanceled) _userResponseListener.cancel();
-    _userResponseListener = FirebaseFirestore.instance
-        .collection('BookedTrips')
-        .doc(controller.bookingId)
-        .collection('response')
-        .doc('end')
-        .snapshots()
-        .listen((event) {
+    if (!isSubscriptionCanceled) _userResponseListener.cancel();
+    _userResponseListener =
+        FirebaseFirestore.instance.collection('BookedTrips').doc(controller.bookingId).collection('response').doc('end').snapshots().listen((event) {
       if (event.data()!.containsKey('response')) {
         if (event.data()!.containsKey('response')) {
-          this.setState(() {
+          setState(() {
             _userResponseListener.cancel();
-            this.isSubscriptionCanceled = true;
-            this._userResponse = event['response'];
-            this.isProcessing = false;
+            isSubscriptionCanceled = true;
+            _userResponse = event['response'];
+            isProcessing = false;
           });
         }
       }
     });
-    this.isSubscriptionCanceled = false;
+    isSubscriptionCanceled = false;
   }
 
   _requestToConfirm() {
     print('Starting to Request the User');
-    HttpsCallable callable =
-        FirebaseFunctions.instance.httpsCallable('confirmUserTripHasEnded');
+    HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('confirmUserTripHasEnded');
     callable.call(<String, dynamic>{
       'docId': 'end',
       'userId': controller.trip!.userId,
@@ -480,10 +448,10 @@ class __RequestToEndSheetState extends State<_RequestToEndSheet> {
               child: Text(
                 'End Trip',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.catamaran(
+                style: AppTextStyle(
                   fontWeight: FontWeight.w900,
                   fontSize: 24.0,
-                  color: AppColors.primary,
+                  color: context.theme.colorScheme.primary,
                 ),
               ),
             ),
@@ -497,10 +465,10 @@ class __RequestToEndSheetState extends State<_RequestToEndSheet> {
                     width: 150,
                     height: 150,
                   ),
-                  VerticalAppSpacer(space: 24.0),
+                  VerticalSpacer(space: 24.0),
                   Text(
                     _getRespectiveText(),
-                    style: GoogleFonts.catamaran(
+                    style: AppTextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 24.0,
                       color: _getTextColor(),
@@ -518,46 +486,42 @@ class __RequestToEndSheetState extends State<_RequestToEndSheet> {
   }
 
   _getRespectiveAnim() {
-    if (this.isProcessing)
+    if (isProcessing) {
       return Assets.animLoading;
-    else if (!this.isProcessing && this._userResponse == true)
+    } else if (!isProcessing && _userResponse == true) {
       return Assets.animSuccessResponse;
-    else if (!this.isProcessing && this._userResponse == false)
+    } else if (!isProcessing && _userResponse == false) {
       return Assets.animRejectResponse;
+    }
   }
 
   _getRespectiveButton() {
     Widget button = Container();
-    if (this.isProcessing)
-      button = Container(
-        child: FullOutlinedTextButton(
-          buttonColor: AppColors.primary,
-          text: 'Request Again',
-          onPressed: requestUser,
-        ),
+    if (isProcessing) {
+      button = OutlinedButton(
+        child:  const Text('Request Again'),
+        onPressed: requestUser,
       );
-    else if (!this.isProcessing && this._userResponse == true)
+    } else if (!isProcessing && _userResponse == true) {
       button = TimerButton(
         time: 3,
         title: 'Close',
         backgroundColor: Colors.white,
-        borderColor: AppColors.primary,
-        textColor: AppColors.primary,
+        borderColor: context.theme.colorScheme.primary,
+        textColor: context.theme.colorScheme.primary,
         onTap: () {
           Get.back();
-          if (this._userResponse) {
+          if (_userResponse) {
             controller.updateTripStatus(TripStatus.ended);
           }
         },
       );
-    else if (!this.isProcessing && this._userResponse == false)
-      button = Container(
-        child: FullOutlinedTextButton(
-          buttonColor: AppColors.error,
-          text: 'Request Again',
-          onPressed: requestUser,
-        ),
+    } else if (!isProcessing && _userResponse == false) {
+      button = OutlinedButton(
+        child: const Text('Request Again'),
+        onPressed: requestUser,
       );
+    }
     return Positioned(
       bottom: 0,
       right: 0,
@@ -567,18 +531,20 @@ class __RequestToEndSheetState extends State<_RequestToEndSheet> {
   }
 
   _getRespectiveText() {
-    if (this.isProcessing)
+    if (isProcessing) {
       return 'Wait for the customer to accept';
-    else if (!this.isProcessing && this._userResponse == true)
+    } else if (!isProcessing && _userResponse == true) {
       return 'Customer have accepted';
-    else if (!this.isProcessing && this._userResponse == false)
+    } else if (!isProcessing && _userResponse == false) {
       return 'Customer have rejected try again';
+    }
   }
 
   _getTextColor() {
-    if (!this.isProcessing && this._userResponse == false)
-      return AppColors.error;
-    else
-      return AppColors.primary;
+    if (!isProcessing && _userResponse == false) {
+      return context.theme.colorScheme.error;
+    } else {
+      return context.theme.colorScheme.primary;
+    }
   }
 }

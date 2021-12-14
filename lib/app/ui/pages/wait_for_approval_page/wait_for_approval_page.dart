@@ -1,9 +1,11 @@
-import 'package:cab_rider_its/app/routes/app_routes.dart';
-import 'package:cab_rider_its/app/ui/global_widgets/global_widgets.dart';
+import 'package:cab_rider_its/app/ui/utils/utils.dart';
+
+import '../../../routes/app_routes.dart';
+import '../../global_widgets/global_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../controllers/controllers.dart';
+import '../../theme/text_theme.dart';
 
 class WaitForApprovalPage extends GetView<WaitForApprovalController> {
   const WaitForApprovalPage({Key? key}) : super(key: key);
@@ -18,36 +20,41 @@ class WaitForApprovalPage extends GetView<WaitForApprovalController> {
           children: [
             Text(
               'Not approved yet?',
-              style: GoogleFonts.catamaran(
+              style: AppTextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const VerticalAppSpacer(),
+            const VerticalSpacer(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
                 'Visit the CAB office and approve your account to continue',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.catamaran(
-                  color: Colors.black45,
-                  fontSize: 14.0,
+                style: AppTextStyle(
+                  fontSize: 12.0,
                 ),
               ),
             ),
-            const VerticalAppSpacer(space: 24.0),
-            FullTextButton(
+            const VerticalSpacer(space: 24.0),
+            TextButton(
               onPressed: () {
                 Get.find<RiderController>().signOutRider().then((isSuccessful) {
                   if (isSuccessful) Get.offAllNamed(AppRoutes.INTRODUCTION);
                 });
               },
-              text: 'Sign Out',
+              child: const Text('Sign Out'),
+              style: TextButton.styleFrom(
+                minimumSize: Size(ResponsiveSize.width(100), 50),
+              ),
             ),
-            const VerticalAppSpacer(space: 12.0),
-            FullOutlinedTextButton(
+            const VerticalSpacer(),
+            OutlinedButton(
               onPressed: controller.checkRiderApproval,
-              text: 'Recheck',
+              child: const Text('Recheck'),
+              style: OutlinedButton.styleFrom(
+                minimumSize: Size(ResponsiveSize.width(100), 50),
+              ),
             )
           ],
         ),
