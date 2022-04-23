@@ -1,12 +1,11 @@
-import 'package:cab_rider_its/app/ui/global_widgets/global_widgets.dart';
+import '../../global_widgets/global_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../controllers/controllers.dart';
+import '../../theme/text_theme.dart';
 
 class RiderFeedbackPage extends GetView<RiderFeedbackController> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,7 +18,7 @@ class RiderFeedbackPage extends GetView<RiderFeedbackController> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding: EdgeInsets.fromLTRB(20.0, 80.0, 20.0, 0.0),
+                    padding: const EdgeInsets.fromLTRB(20.0, 80.0, 20.0, 0.0),
                     child: Column(
                       // crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -27,7 +26,7 @@ class RiderFeedbackPage extends GetView<RiderFeedbackController> {
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
                             'How was client behaviour',
-                            style: GoogleFonts.catamaran(
+                            style: AppTextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: Colors.grey.shade700,
@@ -41,22 +40,21 @@ class RiderFeedbackPage extends GetView<RiderFeedbackController> {
                             direction: Axis.horizontal,
                             allowHalfRating: false,
                             itemCount: 5,
-                            glowColor: Colors.green.shade200,
-                            itemPadding: EdgeInsets.symmetric(horizontal: 12.0),
+                            itemPadding: const EdgeInsets.symmetric(horizontal: 12.0),
                             itemBuilder: (context, _) => Icon(
                               Icons.star,
-                              color: Colors.green,
+                              color: context.theme.colorScheme.primary,
                               size: 50,
                             ),
-                            onRatingUpdate: controller.updateRiderRating ,
+                            onRatingUpdate: controller.updateRiderRating,
                           ),
                         ),
-                        VerticalAppSpacer(space: 24.0),
+                        const VerticalSpacer(),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
                             'How is app working?',
-                            style: GoogleFonts.catamaran(
+                            style: AppTextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: Colors.grey.shade700,
@@ -70,24 +68,22 @@ class RiderFeedbackPage extends GetView<RiderFeedbackController> {
                             direction: Axis.horizontal,
                             allowHalfRating: false,
                             itemCount: 5,
-                            glowColor: Colors.green.shade200,
-                            itemPadding: EdgeInsets.symmetric(horizontal: 12.0),
+                            itemPadding: const EdgeInsets.symmetric(horizontal: 12.0),
                             itemBuilder: (context, _) => Icon(
                               Icons.star,
-                              color: Colors.green,
+                              color: context.theme.colorScheme.primary,
                               size: 50,
                             ),
                             onRatingUpdate: controller.updateAppRating,
                           ),
                         ),
-                        VerticalAppSpacer(space: 24.0),
+                        const VerticalSpacer(space: 24.0),
                         Row(children: [
                           Padding(
-                            padding:
-                                const EdgeInsets.fromLTRB(8.0, 0.0, 0.0, 0.0),
+                            padding: const EdgeInsets.fromLTRB(8.0, 0.0, 0.0, 0.0),
                             child: Text(
                               'Any Comment',
-                              style: GoogleFonts.catamaran(
+                              style: AppTextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.grey.shade700,
@@ -95,19 +91,19 @@ class RiderFeedbackPage extends GetView<RiderFeedbackController> {
                             ),
                           ),
                         ]),
-                        VerticalAppSpacer(space: 4.0),
+                        const VerticalSpacer(space: 4.0),
                         TextField(
                           minLines: 6,
                           maxLines: 10,
                           controller: controller.comment,
-                          style: GoogleFonts.catamaran(
+                          style: AppTextStyle(
                             fontSize: 14.0,
                             color: Colors.grey.shade700,
                           ),
                           decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(8.0),
+                            contentPadding: const EdgeInsets.all(8.0),
                             focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.green),
+                              borderSide: const BorderSide(color: Colors.green),
                               borderRadius: BorderRadius.circular(12.0),
                             ),
                             border: OutlineInputBorder(
@@ -115,11 +111,10 @@ class RiderFeedbackPage extends GetView<RiderFeedbackController> {
                             ),
                           ),
                         ),
-                        VerticalAppSpacer(space: 12.0),
-                        FullOutlinedTextButton(
+                        const VerticalSpacer(space: 12.0),
+                        OutlinedButton(
                           onPressed: controller.submitRating,
-                          text: 'Submit',
-                          backgroundColor: Colors.white.withOpacity(0.0),
+                          child: Text('Submit'),
                         )
                       ],
                     ),
@@ -139,7 +134,7 @@ class RiderFeedbackPage extends GetView<RiderFeedbackController> {
                   child: Center(
                     child: Text(
                       'Ride Finished',
-                      style: GoogleFonts.catamaran(
+                      style: AppTextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w900,
                         color: Colors.green,
@@ -150,7 +145,7 @@ class RiderFeedbackPage extends GetView<RiderFeedbackController> {
               ),
             ),
             IconButton(
-              icon: Icon(
+              icon: const Icon(
                 Icons.clear_rounded,
                 size: 32,
               ),

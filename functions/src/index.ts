@@ -34,12 +34,12 @@ export const notificationWhenNeedDriver = functions.firestore
                 'id': snapshot.id.toString(),
                 'funName': 'notificationWhenNeedDriver',
             },
-            notification: {
-                title: 'Searching',
-                body: `A local person need a driver`,
-                icon: 'your-icon-url',
-                click_action: 'FLUTTER_NOTIFICATION_CLICK' // required only for onResume or onLaunch callbacks
-            }
+            // notification: {
+            //     title: 'Searching',
+            //     body: `A Passenger is searching for a ride`,
+            //     icon: '@mipmap/ic_launcher',
+            //     click_action: 'FLUTTER_NOTIFICATION_CLICK' // required only for onResume or onLaunch callbacks
+            // }
         };
 
         return fcm.sendToTopic('drivers', payload);

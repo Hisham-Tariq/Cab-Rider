@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'rider_controller.dart';
@@ -14,14 +11,10 @@ class SplashController extends GetxController {
     super.onInit();
     if (await isLocationPermissionGranted()) {
       if (_userController.isRiderNotLoggedIn) {
-        Future.delayed(const Duration(seconds: 1))
-            .then((_) => Get.offAllNamed(AppRoutes.INTRODUCTION));
+        Future.delayed(const Duration(seconds: 1)).then((_) => Get.offAllNamed(AppRoutes.INTRODUCTION));
       } else {
         // User is Signed In
-        _userController
-            .riderWithPhoneNumberIsExistInFirestore(
-                _userController.currentRiderPhoneNumber!)
-            .then((value) {
+        _userController.riderWithPhoneNumberIsExistInFirestore(_userController.currentRiderPhoneNumber!).then((value) {
           if (value) {
             //  Rider Already Filled his Profile
             _userController.readCurrentUser().then((_) {
@@ -32,8 +25,7 @@ class SplashController extends GetxController {
               }
             });
           } else {
-            _userController.rider.phoneNumber =
-                _userController.currentRiderPhoneNumber;
+            _userController.rider.phoneNumber = _userController.currentRiderPhoneNumber;
             _userController.rider.id = _userController.currentRiderUID;
             Get.offAllNamed(AppRoutes.RIDER_PERSONAL_INFO);
           }

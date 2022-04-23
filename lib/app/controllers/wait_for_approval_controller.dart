@@ -1,6 +1,7 @@
 import 'package:cab_rider_its/app/routes/app_routes.dart';
 import 'package:get/get.dart';
 
+import '../ui/utils/utils.dart';
 import 'rider_controller.dart';
 
 class WaitForApprovalController extends GetxController {
@@ -10,7 +11,7 @@ class WaitForApprovalController extends GetxController {
       if (controller.rider.isApproved as bool) {
         Get.offAllNamed(AppRoutes.HOME);
       } else {
-        Get.snackbar(
+        showAppSnackBar(
           'Account Approval',
           'Your account has been not approved yet please try checking it later',
         );

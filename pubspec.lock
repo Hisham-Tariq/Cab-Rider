@@ -470,7 +470,7 @@ packages:
       name: get
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.3.8"
+    version: "4.5.1"
   get_storage:
     dependency: "direct main"
     description:
@@ -603,7 +603,7 @@ packages:
       name: material_color_utilities
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.4"
+    version: "0.1.2"
   material_dialogs:
     dependency: "direct main"
     description:
@@ -846,7 +846,7 @@ packages:
       name: test_api
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.4.9"
+    version: "0.4.8"
   timelines:
     dependency: "direct main"
     description:
@@ -874,7 +874,7 @@ packages:
       name: vector_math
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.1.2"
+    version: "2.1.1"
   watcher:
     dependency: transitive
     description:

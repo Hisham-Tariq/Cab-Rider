@@ -23,12 +23,12 @@ handleRequestTheRiderAboutNewTripOnClick(RemoteMessage message) async {
       ),
       context: Get.context as BuildContext,
       actions: [
-        FullTextButton(
+        TextButton(
           onPressed: () {
             updateTheRiderResponse(true, message.data['tripId']);
             navigator!.pop();
           },
-          text: 'Accept',
+          child: Text('Accept'),
         ),
         TimerButton(
           backgroundColor: Colors.red.withOpacity(0.0),
@@ -46,8 +46,7 @@ handleRequestTheRiderAboutNewTripOnClick(RemoteMessage message) async {
 
 firebaseOnMessageClicked(message) {
   print('Message Clicked');
-  if (message.data.containsKey('funName') &&
-      FirebaseAuth.instance.currentUser != null) {
+  if (message.data.containsKey('funName') && FirebaseAuth.instance.currentUser != null) {
     switch (message.data['funName']) {
       case 'requestTheRiderAboutNewTrip':
         handleRequestTheRiderAboutNewTripOnClick(message);

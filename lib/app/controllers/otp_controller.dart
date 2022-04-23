@@ -15,6 +15,8 @@ class OtpController extends GetxController {
   String otpCode = '';
   final buttonState = ButtonState.idle.obs;
 
+  final otpFieldNode = FocusNode();
+
   // OTPController() {
   //   // verificationId = Get.arguments['verificationId'];
   //   // isNewUser = Get.arguments['isNewUser'];
@@ -40,6 +42,7 @@ class OtpController extends GetxController {
     otpCode = value;
     if (value.length == 6) {
       FocusScope.of(Get.context!).unfocus();
+      otpFieldNode.unfocus();
       await Future.delayed(const Duration(milliseconds: 10));
       verifyOTPCode();
     }
@@ -73,8 +76,7 @@ class OtpController extends GetxController {
 
   afterSuccessfullyAuthenticated() {
     var controller = Get.find<RiderController>();
-    controller.rider.phoneNumber =
-        FirebaseAuth.instance.currentUser!.phoneNumber;
+    controller.rider.phoneNumber = FirebaseAuth.instance.currentUser!.phoneNumber;
     if (isNewUser) {
       Get.offAllNamed(AppRoutes.RIDER_PERSONAL_INFO);
     } else {

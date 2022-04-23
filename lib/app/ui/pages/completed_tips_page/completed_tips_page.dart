@@ -1,30 +1,38 @@
-import 'package:cab_rider_its/app/customization/customization.dart';
-import 'package:cab_rider_its/app/generated/assets.dart';
-import 'package:cab_rider_its/app/ui/global_widgets/global_widgets.dart';
+import 'package:cab_rider_its/app/data/models/booked_trip_model/booked_trip_model.dart';
+import 'package:intl/intl.dart';
+
+import '../../../generated/assets.dart';
+import '../../global_widgets/global_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../controllers/controllers.dart';
+import '../../theme/text_theme.dart';
+import '../../utils/utils.dart';
 
 class CompletedTripsPage extends GetView<CompletedTripsController> {
+  const CompletedTripsPage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade200,
       body: SafeArea(
         child: GetBuilder<CompletedTripsController>(builder: (controller) {
-          if (controller.completedTrips == null)
-            return SpinKitFadingCircle(color: AppColors.primary);
-          else if (controller.completedTrips!.length > 0)
+          if (controller.completedTrips.isEmpty) {
+            return const _ZeroCompletedTrips();
+          } else {
             return Stack(
               children: [
                 Container(
-                  padding: EdgeInsets.only(top: 50.0),
-                  color: Colors.grey.shade200,
+                  padding: const EdgeInsets.only(top: 50.0),
                   height: Get.height,
-                  child: _ListOfCompletedTrips(),
+                  child: ListView.builder(
+                    itemCount: controller.completedTrips.length,
+                    itemBuilder: (context, index) {
+                      return _CompletedTripCard(trip: controller.completedTrips[index]);
+                    },
+                  ),
                 ),
                 Positioned(
                   left: 0,
@@ -33,97 +41,72 @@ class CompletedTripsPage extends GetView<CompletedTripsController> {
                   child: Center(
                     child: Text(
                       'Completed Trips',
-                      style: GoogleFonts.catamaran(
+                      style: AppTextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w900,
-                        color: AppColors.primary,
+                        color: context.theme.colorScheme.primary,
                       ),
                     ),
                   ),
                 ),
               ],
             );
-          else
-            return _ZeroCompletedTrips();
+          }
         }),
       ),
     );
   }
 }
 
-class _ListOfCompletedTrips extends StatelessWidget {
-  const _ListOfCompletedTrips({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: Get.find<CompletedTripsController>().completedTrips!.length,
-      itemBuilder: (context, index) {
-        return _CompletedTripCard(tripIndex: index);
-      },
-    );
-  }
-}
-
 class _CompletedTripCard extends StatelessWidget {
-  const _CompletedTripCard({Key? key, required this.tripIndex})
-      : super(key: key);
-  final int tripIndex;
+  const _CompletedTripCard({Key? key, required this.trip}) : super(key: key);
+  final BookedTripModel trip;
   @override
   Widget build(BuildContext context) {
-    var trip = Get.find<CompletedTripsController>().completedTrips![tripIndex];
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-      child: Container(
-        height: 232,
-        width: Get.width,
-        padding: EdgeInsets.all(12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _TitleDetail(
-              title: 'Customer Name',
-              detail: GetUtils.capitalize(trip.userName) as String,
-            ),
-            VerticalAppSpacer(),
-            _TitleDetail(
-              title: 'Booked At',
-              detail: trip.bookedAt!.toDate().toString(),
-            ),
-            VerticalAppSpacer(),
-            _TitleDetail(
-              title: 'Completed At',
-              detail: trip.completedAt!.toDate().toString(),
-            ),
-            VerticalAppSpacer(),
-            _TitleDetail(
-              title: 'Price',
-              detail: trip.tripPrice.toString(),
-            ),
-            VerticalAppSpacer(),
-            _TitleDetail(
-              title: 'Distance',
-              detail: '${trip.tripDistance} KM',
-            ),
-            VerticalAppSpacer(space: 16.0),
-            // FullOutlinedTextButton(
-            //   onPressed: () {},
-            //   text: 'Detail',
-            //   backgroundColor: Colors.grey.withOpacity(0.0),
-            // ),
-          ],
-        ),
-        decoration: BoxDecoration(
-            color: Colors.grey.shade200,
-            borderRadius: BorderRadius.circular(12.0),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.shade300,
-                offset: Offset(0, 2),
-                blurRadius: 8.0,
-                spreadRadius: 8.0,
+      child: Card(
+        child: Container(
+          // height: 232,
+          width: Get.width,
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const VerticalSpacer(),
+              _TitleDetail(
+                title: 'Customer Name',
+                detail: GetUtils.capitalize(trip.userName) as String,
               ),
-            ]),
+              const VerticalSpacer(),
+              _TitleDetail(
+                title: 'Booked At',
+                detail: DateFormat.yMd().add_jm().format(DateTime.parse(trip.bookedAt)),
+              ),
+              const VerticalSpacer(),
+              _TitleDetail(
+                title: 'Completed At',
+                detail: trip.completedAt != null ? DateFormat.yMd().add_jm().format(DateTime.parse(trip.completedAt!)) : "Not Yet",
+              ),
+              const VerticalSpacer(),
+              _TitleDetail(
+                title: 'Price',
+                detail: trip.tripPrice.toString(),
+              ),
+              const VerticalSpacer(),
+              _TitleDetail(
+                title: 'Distance',
+                detail: '${trip.tripDistance} KM',
+              ),
+              const VerticalSpacer(),
+              // OutlinedButton(
+              //   onPressed: () {},
+              //   text: 'Detail',
+              //   backgroundColor: Colors.grey.withOpacity(0.0),
+              // ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -137,7 +120,7 @@ class _ZeroCompletedTrips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 0.0),
+      padding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 0.0),
       child: Stack(
         children: [
           SvgPicture.asset(
@@ -151,7 +134,7 @@ class _ZeroCompletedTrips extends StatelessWidget {
             child: Center(
               child: Text(
                 'No trips completed yet',
-                style: GoogleFonts.catamaran(
+                style: AppTextStyle(
                   fontSize: 24.0,
                   fontWeight: FontWeight.bold,
                 ),
@@ -165,8 +148,7 @@ class _ZeroCompletedTrips extends StatelessWidget {
 }
 
 class _TitleDetail extends StatelessWidget {
-  const _TitleDetail({Key? key, required this.title, required this.detail})
-      : super(key: key);
+  const _TitleDetail({Key? key, required this.title, required this.detail}) : super(key: key);
 
   final String title;
   final String detail;
@@ -178,17 +160,16 @@ class _TitleDetail extends StatelessWidget {
         children: [
           TextSpan(
             text: '$title: ',
-            style: GoogleFonts.catamaran(
+            style: AppTextStyle(
               fontWeight: FontWeight.w900,
-              fontSize: 20,
-              color: Colors.green,
+              fontSize: 16,
+              color: context.theme.colorScheme.tertiary,
             ),
           ),
           TextSpan(
             text: detail,
-            style: GoogleFonts.catamaran(
-              color: Colors.black,
-              fontSize: 18,
+            style: AppTextStyle(
+              fontSize: 16,
             ),
           ),
         ],
