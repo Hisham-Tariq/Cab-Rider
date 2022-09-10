@@ -1,4 +1,4 @@
-# cab_rider_its
+# cab_rider
 
 A new Flutter project.
 
